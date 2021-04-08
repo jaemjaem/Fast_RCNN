@@ -7,10 +7,12 @@ import torch.nn as nn
 class Fast_RCNN(nn.Module):
     def __init__(self):
         super(Fast_RCNN, self).__init__()
+        num_classes = 3
         vgg16 = models.vgg16_bn(pretrained=True)
         self.vgg16_feature = nn.Sequential(*(list(vgg16.features)[:-1])) # 마지막 max pooling 제거하고 Roi pooling으로다가
         self.vgg16_fc = nn.Sequential(*(list(vgg16.classifier)[:-1])) # 마지막 fc layer 제거하고 두개의 layer로다가
-
+        self.class_score = nn.Linear(4096, num_classes + 1)
+        self.bbox_score = nn.Linear(4096, 4*(num_classes + 1))
     def roi_pooling(self, features, batch_region):
         sub_sampling_ratio = features.shape[2] / 224.
         self.max_pool = nn.AdaptiveMaxPool2d(output_size=(7,7))
@@ -29,7 +31,6 @@ class Fast_RCNN(nn.Module):
                 output = output.unsqueeze(0)
                 outputs.append(output)
             outputs = torch.cat(outputs, dim=0)
-            #outputs = outputs.unsqueeze(0)
             result.append(outputs)
             
         result = torch.cat(result, dim=0)
@@ -42,4 +43,6 @@ class Fast_RCNN(nn.Module):
         x = x.view(x.size(0), -1) 
         x = self.vgg16_fc(x)
 
-        return x
+        classifier_vector = self.class_score(x)
+        bbox_vector = self.bbox_score(x)
+        return classifier_vector, bbox_vector
