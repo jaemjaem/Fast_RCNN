@@ -51,6 +51,13 @@ class Fast_RCNN_Dataset(Dataset):
                 y2 = int(xmlbox.find('ymax').text) / image_height
                 box = [x1, y1, x2, y2]
                 resize_box = [int(224*x1), int(224*y1), int(224*x2), int(224*y2)]
+                if(obj.find('name').text == 'person'):
+                    cls = [1, 0, 0, 0]
+                elif(obj.find('name').text == 'tvmonitor'):
+                    cls = [0, 1, 0, 0]
+                elif(obj.find('name').text == 'tvmonitor'):
+                    cls = [0, 0, 1, 0]
+
                 for region in regions:
                     iou = intersection_over_union(resize_box, region)
                     if iou > 0.5 and len(positive) < 16:
@@ -60,12 +67,6 @@ class Fast_RCNN_Dataset(Dataset):
              
             self.positive_sampling.append(positive)
             self.negative_sampling.append(negative)
-
-        # self.sampling = []
-        # for idx in range(len(self.positive_sampling)):
-        #     self.sampling.append(self.positive_sampling[idx] + self.negative_sampling[idx])
-        # print(len(self.sampling))
-        
                     
     def __len__(self): 
         return len(self.data)

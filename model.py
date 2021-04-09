@@ -13,6 +13,7 @@ class Fast_RCNN(nn.Module):
         self.vgg16_fc = nn.Sequential(*(list(vgg16.classifier)[:-1])) # 마지막 fc layer 제거하고 두개의 layer로다가
         self.class_score = nn.Linear(4096, num_classes + 1)
         self.bbox_score = nn.Linear(4096, 4*(num_classes + 1))
+        
     def roi_pooling(self, features, batch_region):
         sub_sampling_ratio = features.shape[2] / 224.
         self.max_pool = nn.AdaptiveMaxPool2d(output_size=(7,7))
