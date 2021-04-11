@@ -13,7 +13,7 @@ label_path = "./VOC2012/label/"
 weight_save_path = './checkpoints/'
 
 log_criterion = nn.CrossEntropyLoss()
-smooth_l1_criterion = nn.SmoothL1Loss()
+smooth_l1_criterion = nn.SmoothL1Loss(beta=1)
 
 N = 64 # num_sampling
 K = 1 # num_classes
